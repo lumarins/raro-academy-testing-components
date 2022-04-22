@@ -12,13 +12,17 @@ export type Endereco = {
 };
 
 export const buscaEnderecoPorCEP = async (cep: string) => {
-  const search = URL.replace('[CEP]', cep);
-  const response = await axios.get<Endereco>(search);
-  const endereco = response.data
+  try {
+    const search = URL.replace('[CEP]', cep);
+    const response = await axios.get<Endereco>(search);
+    const endereco = response.data
 
-  if (!endereco.cep) {
+    if (!endereco.cep) {
+      throw new Error('CEP não encontrado');
+    }
+
+    return response.data;
+  } catch (error) {
     throw new Error('CEP não encontrado');
   }
-
-  return response.data;
 }
