@@ -1,7 +1,8 @@
 import { ChangeEvent, FocusEvent, useCallback, useMemo, useState } from "react";
+import { InputProps } from "../components/Input";
 
 export type ValidationFn = (value: string) => string[];
-export const useValidatedField = (validationFn: ValidationFn) => {
+export const useValidatedField = (validationFn: ValidationFn): Partial<InputProps> => {
   const [value, setValue] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
 

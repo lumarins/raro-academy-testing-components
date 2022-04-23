@@ -41,7 +41,7 @@ export const Cadastro = () => {
     };
 
     await axios.post(
-      'https://3.221.159.196:3320/auth/login',
+      'https://3.221.159.196:3320/auth/cadastrar',
       usuario
     );
   }

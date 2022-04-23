@@ -4,7 +4,7 @@ export const senhaValida = (fieldLabel: string): ValidationFn => (value: string)
   const errors: string[] = [];
 
   if (value.length < 8) {
-    errors.push(`${fieldLabel}  deve ter ao menos 8 caracteres`);
+    errors.push(`${fieldLabel} deve ter ao menos 8 caracteres`);
   }
 
   if (!value.match(/[A-Z]/)) {

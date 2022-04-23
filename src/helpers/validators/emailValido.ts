@@ -3,6 +3,8 @@ import { campoObrigatorio } from "./campoObrigatorio";
 
 export const emailValido = (fieldLabel: string): ValidationFn => (value: string) => {
   const errors = campoObrigatorio(fieldLabel)(value);
+  // baseado na resposta encontrada em
+  // https://stackoverflow.com/a/46181
   const validateEmail = (email: string) => {
     return String(email)
       .toLowerCase()
