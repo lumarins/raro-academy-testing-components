@@ -25,7 +25,11 @@ describe('Cadastro Page', () => {
   });
 
   it('deve validar o formato de e-mail no cadastro', () => {
-
+      let input = screen.getByPlaceholderText('e-mail');
+      const value = faker.internet.email();
+      const mensagemDeValidacao = 'Formato de e-mail inválido';
+      validaErroApresentadoEmTela(input, mensagemDeValidacao);
+      validaErroNaoApresentadoEmTela(input, value, mensagemDeValidacao);
   });
 
   describe('deve validar os critérios de aceitação da senha', () => {
@@ -70,10 +74,37 @@ describe('Cadastro Page', () => {
     });
   });
 
-  it('deve garantir que senha e confirmação sejam iguais', () => {});
+  it('deve garantir que senha e confirmação sejam iguais', () => {
+      let inputSenha = screen.getByPlaceholderText('Senha');
+      let inputConfirmacaoSenha = screen.getByPlaceholderText('Confirmação de Senha');
+      const value = 'Teste@123';
+      const mensagemDeValidacao = 'Senhas não conferem';
+      validaErroNaoApresentadoEmTela(inputSenha, value, mensagemDeValidacao);
+      validaErroApresentadoEmTela(inputConfirmacaoSenha, mensagemDeValidacao);
+      validaErroNaoApresentadoEmTela(inputConfirmacaoSenha, value, mensagemDeValidacao);
+  });
 
   it('deve enviar o formulário se todos os dados estiverem preenchidos corretamente', () => {
+    const nome = screen.getByPlaceholderText('Nome');
+    const email = screen.getByPlaceholderText('e-mail');
+    const senha = screen.getByPlaceholderText('Senha');
+    const confirmacaoSenha = screen.getByPlaceholderText('Confirmação de Senha');
+    const codigoAcesso = screen.getByPlaceholderText('Código de Acesso');
+    const botao = screen.getByText('Cadastrar');
+    const dados = {
+      nome: faker.name.firstName(),
+      email: faker.internet.email(),
+      senha: 'S3nh@!123',
+      codigoAcesso: faker.lorem.paragraph(),
+    };
 
+    setValorInput(nome, dados.nome);
+    setValorInput(email, dados.email);
+    setValorInput(senha, dados.senha);
+    setValorInput(confirmacaoSenha, dados.senha);
+    setValorInput(codigoAcesso, dados.codigoAcesso);
+
+    expect(botao).not.toBeDisabled();
   });
 
   it('deve notificar o usuário que o cadastro foi efetuado com sucesso', () => {
@@ -107,5 +138,36 @@ describe('Cadastro Page', () => {
     );
   });
 
-  it('deve apresentar os erros de validação para o usuário, caso a API retorne erro', () => {});
+  it('deve apresentar os erros de validação para o usuário, caso a API retorne erro', async () => {
+    // setup
+    jest.spyOn(axios, 'post').mockRejectedValue(new Error(''));
+    const nome = screen.getByPlaceholderText('Nome');
+    const email = screen.getByPlaceholderText('e-mail');
+    const senha = screen.getByPlaceholderText('Senha');
+    const confirmacaoSenha = screen.getByPlaceholderText('Confirmação de Senha');
+    const codigoAcesso = screen.getByPlaceholderText('Código de Acesso');
+    const botao = screen.getByText('Cadastrar');
+    const dados = {
+      nome: faker.name.firstName(),
+      email: faker.internet.email(),
+      senha: 'S3nh@!123',
+      codigoAcesso: faker.lorem.paragraph(),
+    };
+    
+    // construcao
+    setValorInput(nome, dados.nome);
+    setValorInput(email, dados.email);
+    setValorInput(senha, dados.senha);
+    setValorInput(confirmacaoSenha, dados.senha);
+    setValorInput(codigoAcesso, dados.codigoAcesso);
+    botao.click();
+    const errorMessage = await screen.findByText('Erro ao tentar cadastrar usuário');
+    
+    // asserts
+    expect(axios.post).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/cadastrar'),
+      dados
+    );
+    expect(errorMessage).toBeInTheDocument();
+  });
 });
